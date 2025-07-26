@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园服务微信下单平台</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <h1>校园服务微信下单平台</h1>
+        <p>便捷生活 · 一键送达</p>
+    </header>
+
+    <main class="services-grid">
+        <!-- 服务项目 -->
+        <div class="service-card" onclick="redirectToOrder('breakfast')">
+            <div class="icon">🥪</div>
+            <h3>校外早餐代购</h3>
+            <p>清晨美味准时送达</p>
+        </div>
+
+        <div class="service-card" onclick="redirectToOrder('snack')">
+            <div class="icon">🍿</div>
+            <h3>校外零食代购</h3>
+            <p>课间解馋必备</p>
+        </div>
+
+        <div class="service-card" onclick="redirectToOrder('express')">
+            <div class="icon">📦</div>
+            <h3>快递代收</h3>
+            <p>代收/送到班</p>
+        </div>
+
+        <div class="service-card" onclick="redirectToOrder('powerbank')">
+            <div class="icon">🔋</div>
+            <h3>充电宝代充</h3>
+            <p>满电续航一整天</p>
+        </div>
+
+        <div class="service-card" onclick="redirectToOrder('phone')">
+            <div class="icon">📱</div>
+            <h3>手机租凭</h3>
+            <p>应急备用机</p>
+        </div>
+
+        <div class="service-card" onclick="redirectToOrder('mp3')">
+            <div class="icon">🎵</div>
+            <h3>MP3售卖</h3>
+            <p>英语听力/课件小说/饭后音乐</p>
+        </div>
+
+        <div class="service-card" onclick="redirectToOrder('gaming')">
+            <div class="icon">🎮</div>
+            <h3>游戏代练</h3>
+            <p>专业游戏代练服务</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>管理员<a href="admin.html">登录入口</a></p>
+        <p>支付后请截图保存凭证 | 订单问题联系微信: bxgcjiedan</p>
+        <p>&copy; 2025 白玄工作室. 版权所有.</p>
+    </footer>
+
+    <script>
+        function redirectToOrder(serviceType) {
+            // 记录服务类型到本地存储
+            localStorage.setItem('selectedService', serviceType);
+            window.location.href = 'order.html';
+        }
+    </script>
+</body>
+</html>
