@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园充电宝代充服务</title>
+    <link rel="stylesheet" href="css/power bank.css">
+</head>
+<body>
+    <div class="notification" id="notification">订单提交成功！请扫码支付</div>
+    
+    <div class="order-confirm" id="order-confirm">
+        <div class="confirm-box">
+            <h3><i class="fas fa-check-circle"></i> 订单确认</h3>
+            <p>订单号: <span id="confirm-order-id"></span></p>
+            <p>金额: ¥<span id="confirm-order-amount"></span></p>
+            <p>请扫码支付后点击"确认支付"</p>
+            <div class="qrcode-container" style="margin: 20px auto;">
+                <div class="qrcode-placeholder">
+                    <img id="confirm-qrcode" src="" alt="支付二维码">
+                </div>
+            </div>
+            <div class="confirm-buttons">
+                <button class="btn-cancel" onclick="closeConfirm()">取消</button>
+                <button class="btn-confirm" onclick="confirmPayment()">确认支付</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-charging-station"></i> 校园充电宝代充服务</h1>
+            <p>便捷充电 · 随用随取 · 快速送达</p>
+        </header>
+        
+        <div class="services">
+            <div class="service-type" onclick="selectService('day')">
+                <h3><i class="fas fa-sun"></i> 白天校内充电</h3>
+                <p>学习期间随时充电</p>
+                <div class="price-tag">起价 1.5元/万毫安时</div>
+            </div>
+            
+            <div class="service-type" onclick="selectService('night')">
+                <h3><i class="fas fa-moon"></i> 晚上校外充电</h3>
+                <p>放学后充电更优惠</p>
+                <div class="price-tag">起价 1元/万毫安时</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-calculator"></i> 服务计算器</h2>
+            <div class="calculator">
+                <div class="options">
+                    <div class="option-group">
+                        <label for="service-type"><i class="fas fa-bolt"></i> 服务类型</label>
+                        <select id="service-type" onchange="calculatePrice()">
+                            <option value="day">白天校内充电</option>
+                            <option value="night">晚上校外充电</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="charge-option"><i class="fas fa-cogs"></i> 充电选项</label>
+                        <select id="charge-option" onchange="calculatePrice()">
+                            <option value="per_unit">按毫安时计费</option>
+                            <option value="weekly">包周特惠</option>
+                            <option value="monthly">包月特惠</option>
+                            <option value="monthly_light">包月套餐</option>
+                            <option value="semester">学期畅充</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group" id="capacity-group">
+                        <label for="capacity"><i class="fas fa-battery-three-quarters"></i> 充电容量(万毫安时)</label>
+                        <input type="number" id="capacity" min="1" max="50" value="10" oninput="calculatePrice()">
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="contact"><i class="fas fa-phone"></i> 联系方式</label>
+                        <input type="text" id="contact" placeholder="请输入手机号或微信号">
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="notes"><i class="fas fa-sticky-note"></i> 备注信息</label>
+                        <input type="text" id="notes" placeholder="特殊要求或说明">
+                    </div>
+                </div>
+                
+                <div class="result">
+                    <h3><i class="fas fa-receipt"></i> 订单详情</h3>
+                    
+                    <div class="price-details">
+                        <div class="price-row">
+                            <span>服务类型:</span>
+                            <span id="service-type-display">白天校内充电</span>
+                        </div>
+                        <div class="price-row">
+                            <span>充电选项:</span>
+                            <span id="charge-option-display">按毫安时计费</span>
+                        </div>
+                        <div class="price-row">
+                            <span>充电容量:</span>
+                            <span id="capacity-display">10 万毫安时</span>
+                        </div>
+                        <div class="price-row">
+                            <span>单价:</span>
+                            <span id="unit-price">1.5 元/万毫安时</span>
+                        </div>
+                        <div class="price-row">
+                            <span>基础费用:</span>
+                            <span id="base-price">15.00 元</span>
+                        </div>
+                        <div class="price-row">
+                            <span>优惠金额:</span>
+                            <span id="discount">0.00 元</span>
+                        </div>
+                    </div>
+                    
+                    <div class="total-price">
+                        总计: <span id="total-price">15.00</span> 元
+                    </div>
+                    
+                    <div class="payment-options">
+                        <div class="payment-option active" onclick="selectPayment('wechat')">
+                            <i class="fab fa-weixin"></i> 微信支付
+                        </div>
+                        <div class="payment-option" onclick="selectPayment('alipay')">
+                            <i class="fab fa-alipay"></i> 支付宝
+                        </div>
+                    </div>
+                    
+                    <div class="qrcode-container">
+                        <p>请扫码支付</p>
+                        <div class="qrcode-placeholder" id="qrcode-container">
+                            <img id="payment-qrcode" src="" alt="支付二维码">
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="placeOrder()">
+                        <i class="fas fa-check-circle"></i> 确认下单
+                    </button>
+                    
+                    <div class="order-status status-pending" id="order-status">
+                        <div class="status-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3>订单已提交</h3>
+                        <p>订单号: <span id="status-order-id"></span></p>
+                        <p>状态: <span id="status-text">等待管理员确认</span></p>
+                        <button class="refresh-btn" onclick="checkOrderStatus()">
+                            <i class="fas fa-sync-alt"></i> 刷新状态
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card admin-section">
+            <h2><i class="fas fa-lock"></i> 管理员登录</h2>
+            <p>查看所有订单信息需要管理员权限</p>
+            
+            <div class="admin-form">
+                <input type="password" id="admin-password" placeholder="请输入管理员密码">
+                <button onclick="adminLogin()">登录</button>
+            </div>
+            
+            <div class="stats-container" id="stats-container" style="display:none;">
+                <div class="stat-card">
+                    <h3>总订单数</h3>
+                    <div class="value" id="total-orders">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>总收入</h3>
+                    <div class="value">¥<span id="total-revenue">0.00</span></div>
+                </div>
+                <div class="stat-card">
+                    <h3>待处理订单</h3>
+                    <div class="value" id="pending-orders">0</div>
+                </div>
+            </div>
+            
+            <div style="margin: 20px 0; display: none;" id="admin-controls">
+                <button class="refresh-btn" onclick="loadOrders()">
+                    <i class="fas fa-sync-alt"></i> 刷新订单列表
+                </button>
+            </div>
+            
+            <table class="orders-table" id="orders-table">
+                <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>服务类型</th>
+                        <th>充电选项</th>
+                        <th>金额(元)</th>
+                        <th>联系方式</th>
+                        <th>状态</th>
+                        <th>时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-body">
+                    <!-- 订单数据将通过JS动态填充 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <p>校园服务微信下单平台 | 支付后请截图保存凭证 | 订单问题联系微信: campus_service</p>
+            <p>© 2023 校园充电服务 | 安全便捷 快速送达</p>
+        </div>
+    </div>
+    
+    <script>
+        // 价格配置
+        const pricing = {
+            day: {
+                per_unit: 1.5,
+                weekly: 15,
+                monthly: 50,
+                monthly_light: 35,
+                semester: 168
+            },
+            night: {
+                per_unit: 1.0,
+                weekly: 10,
+                monthly: 30,
+                monthly_light: 20,
+                semester: 128
+            }
+        };
+        
+        // 服务类型名称映射
+        const serviceNames = {
+            day: "白天校内充电",
+            night: "晚上校外充电"
+        };
+        
+        // 充电选项名称映射
+        const optionNames = {
+            per_unit: "按毫安时计费",
+            weekly: "包周特惠",
+            monthly: "包月特惠",
+            monthly_light: "包月套餐",
+            semester: "学期畅充"
+        };
+        
+        // 当前选中的支付方式
+        let selectedPayment = 'wechat';
+        let currentAmount = 15.00;
+        let currentOrderId = '';
+        
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            calculatePrice();
+            initSampleOrders();
+        });
+        
+        // 初始化示例订单
+        function initSampleOrders() {
+            if (!localStorage.getItem('chargingOrders')) {
+                const sampleOrders = [
+                    {
+                        id: 'ORD1681234567',
+                        serviceType: "白天校内充电",
+                        chargeOption: "包周特惠",
+                        capacity: "套餐",
+                        amount: "15.00",
+                        contact: "138****1234",
+                        notes: "高三(5)班 李明",
+                        paymentMethod: "微信支付",
+                        status: "已确认",
+                        timestamp: new Date().toLocaleString()
+                    },
+                    {
+                        id: 'ORD1681234568',
+                        serviceType: "晚上校外充电",
+                        chargeOption: "按毫安时计费",
+                        capacity: "15 万毫安时",
+                        amount: "15.00",
+                        contact: "wxid_student2023",
+                        notes: "高二(3)班 张华",
+                        paymentMethod: "支付宝",
+                        status: "待确认",
+                        timestamp: new Date().toLocaleString()
+                    }
+                ];
+                localStorage.setItem('chargingOrders', JSON.stringify(sampleOrders));
+            }
+        }
+        
+        // 选择服务类型
+        function selectService(type) {
+            document.getElementById('service-type').value = type;
+            calculatePrice();
+        }
+        
+        // 选择支付方式
+        function selectPayment(payment) {
+            selectedPayment = payment;
+            document.querySelectorAll('.payment-option').forEach(el => {
+                el.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            updateQRCode();
+        }
+        
+        // 计算价格
+        function calculatePrice() {
+            const serviceType = document.getElementById('service-type').value;
+            const chargeOption = document.getElementById('charge-option').value;
+            let capacity = parseInt(document.getElementById('capacity').value) || 0;
+            
+            // 更新显示值
+            document.getElementById('service-type-display').textContent = serviceNames[serviceType];
+            document.getElementById('charge-option-display').textContent = optionNames[chargeOption];
+            document.getElementById('capacity-display').textContent = capacity + " 万毫安时";
+            document.getElementById('unit-price').textContent = pricing[serviceType].per_unit + " 元/万毫安时";
+            
+            // 根据选项显示/隐藏容量输入
+            const capacityGroup = document.getElementById('capacity-group');
+            if (chargeOption === 'per_unit') {
+                capacityGroup.style.display = 'block';
+            } else {
+                capacityGroup.style.display = 'none';
+                capacity = 1; // 非按量计费时容量显示为1
+            }
+            
+            // 计算价格
+            let basePrice = 0;
+            let discount = 0;
+            let totalPrice = 0;
+            
+            if (chargeOption === 'per_unit') {
+                basePrice = capacity * pricing[serviceType].per_unit;
+                totalPrice = basePrice;
+            } else {
+                basePrice = pricing[serviceType][chargeOption];
+                totalPrice = basePrice;
+                
+                // 显示折扣信息（与按量计费比较）
+                const comparePrice = getComparePrice(serviceType, chargeOption);
+                discount = comparePrice - totalPrice;
+            }
+            
+            // 更新显示
+            document.getElementById('base-price').textContent = basePrice.toFixed(2) + " 元";
+            document.getElementById('discount').textContent = discount > 0 ? "-" + discount.toFixed(2) + " 元" : "0.00 元";
+            document.getElementById('total-price').textContent = totalPrice.toFixed(2);
+            
+            // 更新当前金额
+            currentAmount = totalPrice;
+            updateQRCode();
+        }
+        
+        // 更新二维码显示
+        function updateQRCode() {
+            // 获取金额（四舍五入到小数点后两位）
+            const amount = parseFloat(currentAmount.toFixed(2));
+            
+            // 创建金额字符串（用于文件名）
+            let amountStr = amount.toString();
+            
+            // 替换小数点（如果文件名中需要）
+            // 例如：15.00 -> 15, 1.50 -> 1_5
+            if (amount % 1 !== 0) {
+                amountStr = amountStr.replace('.', '_');
+            } else {
+                amountStr = amount.toFixed(0);
+            }
+            
+            // 生成二维码URL - 需要替换为您的实际路径
+            // 格式：qrcodes/支付方式_金额.png
+            const qrUrl = `qrcodes/${selectedPayment}_${amountStr}.png`;
+            
+            // 更新图片src
+            document.getElementById('payment-qrcode').src = qrUrl;
+        }
+        
+        // 获取比较价格（用于显示折扣）
+        function getComparePrice(serviceType, chargeOption) {
+            let compareCapacity = 10; // 默认比较容量
+            
+            // 设置不同套餐的比较容量
+            switch(chargeOption) {
+                case 'weekly': compareCapacity = 15; break;
+                case 'monthly': compareCapacity = 20; break;
+                case 'monthly_light': compareCapacity = 10; break;
+                case 'semester': compareCapacity = 56; // 学期约16周*3.5
+            }
+            
+            return compareCapacity * pricing[serviceType].per_unit;
+        }
+        
+        // 下单
+        function placeOrder() {
+            const serviceType = document.getElementById('service-type').value;
+            const chargeOption = document.getElementById('charge-option').value;
+            const capacity = document.getElementById('capacity').value;
+            const contact = document.getElementById('contact').value;
+            const notes = document.getElementById('notes').value;
+            const totalPrice = parseFloat(document.getElementById('total-price').textContent);
+            
+            if (!contact) {
+                alert('请输入联系方式！');
+                return;
+            }
+            
+            if (!contact.match(/(1[3-9]\d{9}|[a-zA-Z0-9_-]{5,})/)) {
+                alert('请输入有效的手机号或微信号！');
+                return;
+            }
+            
+            // 创建订单对象
+            const order = {
+                id: 'ORD' + Date.now(),
+                serviceType: serviceNames[serviceType],
+                chargeOption: optionNames[chargeOption],
+                capacity: chargeOption === 'per_unit' ? capacity + " 万毫安时" : "套餐",
+                amount: totalPrice.toFixed(2),
+                contact: contact,
+                notes: notes || "无",
+                paymentMethod: selectedPayment === 'wechat' ? '微信支付' : '支付宝',
+                status: '待确认',
+                timestamp: new Date().toLocaleString()
+            };
+            
+            // 保存订单ID
+            currentOrderId = order.id;
+            
+            // 保存订单
+            saveOrder(order);
+            
+            // 显示订单状态
+            showOrderStatus(order);
+            
+            // 显示确认框
+            document.getElementById('confirm-order-id').textContent = order.id;
+            document.getElementById('confirm-order-amount').textContent = totalPrice.toFixed(2);
+            
+            // 在确认框中显示二维码
+            document.getElementById('confirm-qrcode').src = document.getElementById('payment-pay').src;
+            
+            document.getElementById('order-confirm').classList.add('active');
+        }
+        
+        // 保存订单
+        function saveOrder(order) {
+            let orders = JSON.parse(localStorage.getItem('chargingOrders')) || [];
+            orders.push(order);
+            localStorage.setItem('chargingOrders', JSON.stringify(orders));
+        }
+        
+        // 显示订单状态
+        function showOrderStatus(order) {
+            document.getElementById('status-order-id').textContent = order.id;
+            document.getElementById('status-text').textContent = "等待管理员确认";
+            document.getElementById('order-status').style.display = 'block';
+        }
+        
+        // 检查订单状态
+        function checkOrderStatus() {
+            const orders = JSON.parse(localStorage.getItem('chargingOrders')) || [];
+            const order = orders.find(o => o.id === currentOrderId);
+            
+            if (order) {
+                document.getElementById('status-text').textContent = order.status;
+                
+                if (order.status === '已确认') {
+                    document.getElementById('order-status').className = 'order-status status-confirmed';
+                    document.getElementById('status-text').innerHTML = '<span style="color:#27ae60;">已确认 ✓</span>';
+                }
+            }
+        }
+        
+        // 关闭确认框
+        function closeConfirm() {
+            document.getElementById('order-confirm').classList.remove('active');
+        }
+        
+        // 确认支付
+        function confirmPayment() {
+            // 关闭确认框
+            closeConfirm();
+            
+            // 显示通知
+            showNotification("订单支付成功！等待管理员确认");
+        }
+        
+        // 显示通知
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 管理员登录
+        function adminLogin() {
+            const password = document.getElementById('admin-password').value;
+            // 实际项目中应验证密码
+            if (password === 'admin123') { // 示例密码，实际使用应更改
+                // 显示管理功能
+                document.getElementById('orders-table').style.display = 'table';
+                document.getElementById('stats-container').style.display = 'flex';
+                document.getElementById('admin-controls').style.display = 'block';
+                
+                // 加载订单
+                loadOrders();
+                
+                showNotification("管理员登录成功！");
+            } else {
+                alert('管理员密码错误！');
+            }
+        }
+        
+        // 加载订单数据
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('chargingOrders')) || [];
+            const tableBody = document.getElementById('orders-body');
+            tableBody.innerHTML = '';
+            
+            if (orders.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">暂无订单</td></tr>';
+                updateStats(orders);
+                return;
+            }
+            
+            // 更新订单列表
+            orders.forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${order.id}</td>
+                    <td>${order.serviceType}</td>
+                    <td>${order.chargeOption}</td>
+                    <td>${order.amount}</td>
+                    <td>${order.contact}</td>
+                    <td class="status-${order.status === '待确认' ? 'pending' : 'confirmed'}">${order.status}</td>
+                    <td>${order.timestamp}</td>
+                    <td>
+                        ${order.status === '待确认' ? 
+                            `<button class="btn-confirm" style="padding:5px 10px;font-size:14px;" onclick="confirmOrder('${order.id}')">确认</button>` : 
+                            `<span class="status-confirmed">已处理</span>`}
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // 更新统计信息
+            updateStats(orders);
+        }
+        
+        // 更新统计数据
+        function updateStats(orders) {
+            let totalOrders = orders.length;
+            let totalRevenue = 0;
+            let pendingOrders = 0;
+            
+            orders.forEach(order => {
+                totalRevenue += parseFloat(order.amount);
+                if (order.status === '待确认') pendingOrders++;
+            });
+            
+            document.getElementById('total-orders').textContent = totalOrders;
+            document.getElementById('total-revenue').textContent = totalRevenue.toFixed(2);
+            document.getElementById('pending-orders').textContent = pendingOrders;
+        }
+        
+        // 确认订单
+        function confirmOrder(orderId) {
+            const orders = JSON.parse(localStorage.getItem('chargingOrders')) || [];
+            const orderIndex = orders.findIndex(order => order.id === orderId);
+            
+            if (orderIndex !== -1) {
+                orders[orderIndex].status = "已确认";
+                localStorage.setItem('chargingOrders', JSON.stringify(orders));
+                loadOrders();
+                showNotification("订单已确认！");
+            }
+        }
+    </script>
+</body>
+</html>
